@@ -7,5 +7,5 @@ The Game
 
 For more informaiton about the game, see ryanb / ruby-warrior on Github:
 
-https://github.com/ryanb/ruby-warrior click to edit
+https://github.com/ryanb/ruby-warrior
 
