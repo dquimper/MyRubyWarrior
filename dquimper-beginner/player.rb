@@ -2,23 +2,53 @@ class Player
 
   def play_turn(warrior)
     init(warrior)
+    @warrior = warrior
 
-    if not healthy?(warrior)
-      if warrior.feel.enemy?
-        warrior.walk!(:backward)
-        return
+    if resting? and @warrior.health < @max_health
+      rest!
+    elsif not healthy?
+      if @warrior.feel.enemy?
+        walk!(:backward)
       else
-        warrior.rest!
-        return
+        rest!
       end
+    elsif warrior.feel.enemy? and healthy?
+      attack!
+    else
+      walk!
     end
 
-    if warrior.feel.enemy? and healthy?(warrior)
-      warrior.attack!
-      return
-    end
+    perform_action
+    deinit()
+  end
 
-    warrior.walk!
+  def perform_action
+    case @last_action
+      when :rest
+        @warrior.rest!
+      when :walk
+        @warrior.walk!(@direction)
+      when :attack
+        @warrior.attack!(@direction)
+    end
+  end
+
+  def resting?
+    @last_action == :rest && @last_health < @warrior.health
+  end
+
+  def rest!
+    @last_action = :rest
+  end
+
+  def walk!(direction = :forward)
+    @last_action = :walk
+    @direction = direction
+  end
+
+  def attack!(direction = :forward)
+    @last_action = :attack
+    @direction = direction
   end
 
   def init(warrior)
@@ -26,11 +56,15 @@ class Player
 
     @initialized = true
     @max_health = warrior.health
+    @last_health = @max_health
   end
 
+  def deinit
+    @last_health = @warrior.health
+  end
 
-  def healthy?(warrior)
-    warrior.health >= (@max_health * 0.7)
+  def healthy?
+    @warrior.health >= (@max_health * 0.5)
   end
 
 
